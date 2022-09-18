@@ -207,7 +207,18 @@ meanReplaced <- meanReplaced %>% mutate_all(
 head(meanReplaced)
 
 # group data by month
-monthGroupedDf <- airdf %>% group_by(Month)
-monthGroupedDf
+library(zoo)
+library(data.table)
+setDT(airdf)
 
-mean(monthGroupedDf[,1], na.rm = TRUE)
+cols <- names(airdf)
+
+meanReplacedDf <- airdf[, (cols) := lapply(.SD, na.aggregate)
+    , by = Month
+    , .SDcols = cols][]
+head(meanReplacedDf)
+
+
+#interpolation of missing values
+airdf <- airdf %>% mutate(Ozone = na.approx(Ozone))
+airdf
